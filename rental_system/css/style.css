@@ -103,6 +103,10 @@ body {
     margin-top: 70px;
 }
 
+.hero.canteen-hero {
+    background: linear-gradient(rgba(231, 76, 60, 0.7), rgba(243, 156, 18, 0.7)), url('https://images.unsplash.com/photo-1567521464027-f127ff144326?ixlib=rb-4.0.3') center/cover;
+}
+
 .hero-content h1 {
     font-size: 3.5rem;
     margin-bottom: 1rem;
