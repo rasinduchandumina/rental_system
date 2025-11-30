@@ -65,8 +65,8 @@ CREATE TABLE IF NOT EXISTS order_items (
 
 -- Insert test data
 
--- Test users with hashed passwords (password is 'password123' for all)
--- Hash generated using PHP password_hash('password123', PASSWORD_DEFAULT)
+-- Test users with hashed passwords (password is 'password' for all)
+-- Hash generated using PHP password_hash('password', PASSWORD_DEFAULT)
 INSERT INTO users (username, email, password, full_name, phone, role) VALUES
 ('admin', 'admin@canteen.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'System Admin', '0771234567', 'admin'),
 ('teacher1', 'teacher1@school.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'John Smith', '0772345678', 'teacher'),

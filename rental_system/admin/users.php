@@ -111,10 +111,8 @@ if($roleFilter) {
 }
 
 if($searchTerm) {
-    $whereClause .= " AND (username LIKE :search OR full_name LIKE :search2 OR email LIKE :search3)";
+    $whereClause .= " AND (username LIKE :search OR full_name LIKE :search OR email LIKE :search)";
     $params[':search'] = "%$searchTerm%";
-    $params[':search2'] = "%$searchTerm%";
-    $params[':search3'] = "%$searchTerm%";
 }
 
 // Get users

@@ -32,12 +32,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['place_order'])) {
         try {
             $db->beginTransaction();
             
-            // Generate unique 5-digit order code
+            // Generate unique 5-digit order code with retry limit
+            $max_attempts = 100;
+            $attempts = 0;
             do {
-                $order_code = str_pad(rand(10000, 99999), 5, '0', STR_PAD_LEFT);
+                $order_code = str_pad(random_int(10000, 99999), 5, '0', STR_PAD_LEFT);
                 $check = $db->prepare("SELECT id FROM orders WHERE order_code = :code");
                 $check->bindParam(':code', $order_code);
                 $check->execute();
+                $attempts++;
+                if($attempts >= $max_attempts) {
+                    throw new Exception('Unable to generate unique order code. Please try again.');
+                }
             } while($check->rowCount() > 0);
             
             // Calculate total

@@ -56,6 +56,12 @@ if(isset($_GET['delete_order'])) {
 $statusFilter = isset($_GET['status']) ? $_GET['status'] : '';
 $searchCode = isset($_GET['order_code']) ? trim($_GET['order_code']) : '';
 
+// Validate order code format (must be exactly 5 digits)
+if($searchCode && !preg_match('/^[0-9]{5}$/', $searchCode)) {
+    $searchCode = '';
+    $error = "Invalid order code format. Please enter exactly 5 digits.";
+}
+
 // Build query with filters
 $whereClause = "WHERE 1=1";
 $params = [];

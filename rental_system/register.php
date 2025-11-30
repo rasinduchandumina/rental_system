@@ -286,8 +286,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                         </label>
                     </div>
                     <div class="role-option">
+                        <?php $selectedRole = isset($_POST['role']) ? $_POST['role'] : 'student'; ?>
                         <input type="radio" id="student" name="role" value="student" 
-                               <?php echo (!isset($_POST['role']) || $_POST['role'] == 'student') ? 'checked' : ''; ?>>
+                               <?php echo ($selectedRole == 'student') ? 'checked' : ''; ?>>
                         <label for="student">
                             <i class="fas fa-user-graduate"></i>
                             Student
