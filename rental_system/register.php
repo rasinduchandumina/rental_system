@@ -74,7 +74,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
             
         } catch(Exception $e) {
-            $error = 'Database error: ' . $e->getMessage();
+            // Log error for debugging (in production, use proper logging)
+            error_log('Registration error: ' . $e->getMessage());
+            $error = 'An error occurred while creating your account. Please try again later.';
         }
     }
 }
