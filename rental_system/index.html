@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tool Rental System - Home</title>
+    <title>Canteen Ordering System - Home</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -13,14 +13,14 @@
         <nav class="navbar">
             <div class="nav-container">
                 <div class="nav-logo">
-                    <i class="fas fa-tools"></i>
-                    <span>ToolRent Pro</span>
+                    <i class="fas fa-utensils"></i>
+                    <span>School Canteen</span>
                 </div>
                 <ul class="nav-menu">
-                    <li><a href="index.html" class="nav-link active">Home</a></li>
+                    <li><a href="index.html" class="nav-link active">Menu</a></li>
                     <li><a href="about.html" class="nav-link">About</a></li>
                     <li><a href="contact.html" class="nav-link">Contact</a></li>
-                    <li><a href="admin/login.php" class="nav-link">Admin</a></li>
+                    <li><a href="login.php" class="nav-link"><i class="fas fa-sign-in-alt"></i> Login</a></li>
                 </ul>
                 <div class="hamburger">
                     <span class="bar"></span>
@@ -32,20 +32,20 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="hero">
+    <section class="hero canteen-hero">
         <div class="hero-content">
-            <h1>Rent Professional Tools</h1>
-            <p>Get access to high-quality tools for your projects without the high cost of ownership</p>
-            <button class="cta-button" onclick="scrollToItems()">Browse Tools</button>
+            <h1>Welcome to School Canteen</h1>
+            <p>Delicious food for students and teachers. Order your favorite meals easily!</p>
+            <button class="cta-button" onclick="scrollToItems()">View Menu</button>
         </div>
     </section>
 
     <!-- Search Section -->
     <section class="search-section">
         <div class="container">
-            <h2>Find the Right Tool</h2>
+            <h2>Find Your Favorite Food</h2>
             <div class="search-bar">
-                <input type="text" id="searchInput" placeholder="Search for tools...">
+                <input type="text" id="searchInput" placeholder="Search for food items...">
                 <select id="categoryFilter">
                     <option value="">All Categories</option>
                 </select>
@@ -54,87 +54,30 @@
         </div>
     </section>
 
-    <!-- Featured Items Section -->
+    <!-- Food Items Section -->
     <section class="items-section" id="items-section">
         <div class="container">
-            <h2>Available Tools</h2>
+            <h2>Our Menu</h2>
             <div id="items-grid" class="items-grid">
-                <!-- Items will be loaded here dynamically -->
+                <!-- Food items will be loaded here dynamically -->
             </div>
-            <div id="loading" class="loading">Loading tools...</div>
+            <div id="loading" class="loading">Loading menu...</div>
         </div>
     </section>
 
-    <!-- Rental Form Modal -->
-    <div id="rentalModal" class="modal">
+    <!-- Login Required Modal -->
+    <div id="loginRequiredModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Rent This Tool</h2>
-            <form id="rentalForm">
-                <input type="hidden" id="itemId" name="itemId">
-                <div class="form-group">
-                    <label for="customerName">Full Name:</label>
-                    <input type="text" id="customerName" name="customerName" required>
+            <div class="login-required-content">
+                <i class="fas fa-lock" style="font-size: 3rem; color: #f39c12; margin-bottom: 1rem;"></i>
+                <h2>Login Required</h2>
+                <p>You need to login to place an order. Please login with your account or create a new one.</p>
+                <div class="modal-buttons">
+                    <a href="login.php" class="btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>
+                    <a href="register.php" class="btn-secondary"><i class="fas fa-user-plus"></i> Create Account</a>
                 </div>
-                <div class="form-group">
-                    <label for="customerEmail">Email:</label>
-                    <input type="email" id="customerEmail" name="customerEmail" required>
-                </div>
-                <div class="form-group">
-                    <label for="customerPhone">Phone:</label>
-                    <input type="tel" id="customerPhone" name="customerPhone" required>
-                </div>
-                <div class="form-group">
-                    <label for="rentalDate">Rental Date:</label>
-                    <input type="date" id="rentalDate" name="rentalDate" required>
-                </div>
-                <div class="form-group">
-                    <label for="returnDate">Return Date:</label>
-                    <input type="date" id="returnDate" name="returnDate" required>
-                </div>
-                <div class="form-group">
-                    <label for="quantity">Quantity:</label>
-                    <input type="number" id="quantity" name="quantity" min="1" value="1" required>
-                </div>
-                <div class="total-cost">
-                    <strong>Total Cost: $<span id="totalCost">0.00</span></strong>
-                </div>
-                <button type="submit">Submit Rental Request</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Feedback Modal -->
-    <div id="feedbackModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Leave Feedback</h2>
-            <form id="feedbackForm">
-                <div class="form-group">
-                    <label for="feedbackName">Your Name:</label>
-                    <input type="text" id="feedbackName" name="feedbackName" required>
-                </div>
-                <div class="form-group">
-                    <label for="feedbackEmail">Your Email:</label>
-                    <input type="email" id="feedbackEmail" name="feedbackEmail" required>
-                </div>
-                <div class="form-group">
-                    <label for="rating">Rating:</label>
-                    <div class="rating">
-                        <span class="star" data-rating="1">★</span>
-                        <span class="star" data-rating="2">★</span>
-                        <span class="star" data-rating="3">★</span>
-                        <span class="star" data-rating="4">★</span>
-                        <span class="star" data-rating="5">★</span>
-                    </div>
-                    <input type="hidden" id="ratingValue" name="rating" required>
-                </div>
-                <div class="form-group">
-                    <label for="feedbackMessage">Your Feedback:</label>
-                    <textarea id="feedbackMessage" name="message" rows="5" required></textarea>
-                </div>
-                <button type="submit">Submit Feedback</button>
-            </form>
+            </div>
         </div>
     </div>
 
@@ -143,13 +86,13 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h3><i class="fas fa-tools"></i> ToolRent Pro</h3>
-                    <p>Your trusted partner for professional tool rental services.</p>
+                    <h3><i class="fas fa-utensils"></i> School Canteen</h3>
+                    <p>Serving delicious and healthy food to our school community.</p>
                 </div>
                 <div class="footer-section">
                     <h4>Quick Links</h4>
                     <ul>
-                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html">Menu</a></li>
                         <li><a href="about.html">About</a></li>
                         <li><a href="contact.html">Contact</a></li>
                     </ul>
@@ -157,11 +100,11 @@
                 <div class="footer-section">
                     <h4>Contact Info</h4>
                     <p><i class="fas fa-phone"></i> (555) 123-4567</p>
-                    <p><i class="fas fa-envelope"></i> info@toolrentpro.com</p>
+                    <p><i class="fas fa-envelope"></i> canteen@school.com</p>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 ToolRent Pro. All rights reserved.</p>
+                <p>&copy; 2025 School Canteen. All rights reserved.</p>
             </div>
         </div>
     </footer>
