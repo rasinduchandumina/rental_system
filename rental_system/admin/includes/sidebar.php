@@ -7,9 +7,9 @@
             </a>
         </li>
         <li>
-            <a href="inventory.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'inventory.php' ? 'active' : ''; ?>">
-                <i class="fas fa-boxes"></i>
-                <span>Inventory</span>
+            <a href="food_items.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'food_items.php' ? 'active' : ''; ?>">
+                <i class="fas fa-hamburger"></i>
+                <span>Food Items</span>
             </a>
         </li>
         <li>
@@ -19,21 +19,15 @@
             </a>
         </li>
         <li>
-            <a href="feedback.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'feedback.php' ? 'active' : ''; ?>">
-                <i class="fas fa-comments"></i>
-                <span>Feedback</span>
-            </a>
-        </li>
-        <li>
-            <a href="inquiries.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'inquiries.php' ? 'active' : ''; ?>">
-                <i class="fas fa-envelope"></i>
-                <span>Inquiries</span>
+            <a href="users.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? 'active' : ''; ?>">
+                <i class="fas fa-users"></i>
+                <span>Users</span>
             </a>
         </li>
         <li>
             <a href="../index.html" target="_blank">
                 <i class="fas fa-external-link-alt"></i>
-                <span>View Website</span>
+                <span>View Menu</span>
             </a>
         </li>
     </ul>

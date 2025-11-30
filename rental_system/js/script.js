@@ -1,7 +1,6 @@
 // Global variables
 let items = [];
 let categories = [];
-let selectedRating = 0;
 
 // DOM Content Loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -13,18 +12,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize the application
 function initializeApp() {
-    // Set minimum date for rental forms
-    const today = new Date().toISOString().split('T')[0];
-    const rentalDateInput = document.getElementById('rentalDate');
-    const returnDateInput = document.getElementById('returnDate');
+    // Initialize mobile menu
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
     
-    if (rentalDateInput) {
-        rentalDateInput.min = today;
-        rentalDateInput.addEventListener('change', updateReturnDateMin);
-    }
-    
-    if (returnDateInput) {
-        returnDateInput.min = today;
+    if (hamburger && navMenu) {
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
     }
 }
 
@@ -35,11 +31,6 @@ function setupEventListeners() {
     const navMenu = document.querySelector('.nav-menu');
     
     if (hamburger && navMenu) {
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('active');
-            navMenu.classList.toggle('active');
-        });
-        
         // Close mobile menu when clicking on a link
         document.querySelectorAll('.nav-link').forEach(n => n.addEventListener('click', () => {
             hamburger.classList.remove('active');
@@ -49,15 +40,6 @@ function setupEventListeners() {
     
     // Modal event listeners
     setupModalListeners();
-    
-    // Form event listeners
-    setupFormListeners();
-    
-    // FAQ toggle listeners
-    setupFAQListeners();
-    
-    // Star rating listeners
-    setupStarRatingListeners();
     
     // Search functionality
     const searchInput = document.getElementById('searchInput');
@@ -92,102 +74,6 @@ function setupModalListeners() {
                 this.style.display = 'none';
             }
         });
-    });
-}
-
-// Setup form event listeners
-function setupFormListeners() {
-    // Rental form
-    const rentalForm = document.getElementById('rentalForm');
-    if (rentalForm) {
-        rentalForm.addEventListener('submit', handleRentalSubmit);
-        
-        // Update total cost when dates or quantity change
-        const dateInputs = rentalForm.querySelectorAll('input[type="date"], input[type="number"]');
-        dateInputs.forEach(input => {
-            input.addEventListener('change', calculateTotalCost);
-        });
-    }
-    
-    // Feedback form
-    const feedbackForm = document.getElementById('feedbackForm');
-    if (feedbackForm) {
-        feedbackForm.addEventListener('submit', handleFeedbackSubmit);
-    }
-    
-    // Contact form
-    const contactForm = document.getElementById('contactForm');
-    if (contactForm) {
-        contactForm.addEventListener('submit', handleContactSubmit);
-    }
-}
-
-// Setup FAQ toggle listeners
-function setupFAQListeners() {
-    const faqQuestions = document.querySelectorAll('.faq-question');
-    faqQuestions.forEach(question => {
-        question.addEventListener('click', function() {
-            const faqItem = this.parentElement;
-            const isActive = faqItem.classList.contains('active');
-            
-            // Close all FAQ items
-            document.querySelectorAll('.faq-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // Toggle current item
-            if (!isActive) {
-                faqItem.classList.add('active');
-            }
-        });
-    });
-}
-
-// Setup star rating listeners
-function setupStarRatingListeners() {
-    const stars = document.querySelectorAll('.star');
-    stars.forEach(star => {
-        star.addEventListener('click', function() {
-            selectedRating = parseInt(this.dataset.rating);
-            updateStarDisplay();
-            document.getElementById('ratingValue').value = selectedRating;
-        });
-        
-        star.addEventListener('mouseover', function() {
-            const rating = parseInt(this.dataset.rating);
-            highlightStars(rating);
-        });
-    });
-    
-    const ratingContainer = document.querySelector('.rating');
-    if (ratingContainer) {
-        ratingContainer.addEventListener('mouseleave', function() {
-            updateStarDisplay();
-        });
-    }
-}
-
-// Update star display
-function updateStarDisplay() {
-    const stars = document.querySelectorAll('.star');
-    stars.forEach((star, index) => {
-        if (index < selectedRating) {
-            star.classList.add('active');
-        } else {
-            star.classList.remove('active');
-        }
-    });
-}
-
-// Highlight stars on hover
-function highlightStars(rating) {
-    const stars = document.querySelectorAll('.star');
-    stars.forEach((star, index) => {
-        if (index < rating) {
-            star.classList.add('active');
-        } else {
-            star.classList.remove('active');
-        }
     });
 }
 
@@ -230,7 +116,7 @@ async function loadItems() {
             items = data.items;
             displayItems(items);
         } else {
-            showError('Failed to load items');
+            showError('Failed to load menu items');
         }
     } catch (error) {
         console.error('Error loading items:', error);
@@ -246,7 +132,7 @@ function displayItems(itemsToShow) {
     if (!itemsGrid) return;
     
     if (itemsToShow.length === 0) {
-        itemsGrid.innerHTML = '<p class="no-results">No tools found matching your criteria.</p>';
+        itemsGrid.innerHTML = '<p class="no-results">No food items found matching your criteria.</p>';
         return;
     }
     
@@ -255,22 +141,21 @@ function displayItems(itemsToShow) {
             <div class="item-image">
                 ${item.image_url ? 
                     `<img src="${item.image_url}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;">` : 
-                    `<i class="fas fa-tools"></i>`
+                    `<i class="fas fa-hamburger"></i>`
                 }
             </div>
             <div class="item-content">
                 <h3>${item.name}</h3>
-                <p>${item.description}</p>
-                ${item.specifications ? `<div class="item-specs"><strong>Specs:</strong> ${item.specifications}</div>` : ''}
+                <p>${item.description || 'Delicious food item'}</p>
                 <div class="item-footer">
                     <div class="item-info">
-                        <div class="price">$${parseFloat(item.price_per_day).toFixed(2)}/day</div>
-                        <div class="availability ${item.available_quantity > 0 ? 'in-stock' : 'out-of-stock'}">
-                            ${item.available_quantity > 0 ? `${item.available_quantity} available` : 'Out of stock'}
+                        <div class="price">Rs. ${parseFloat(item.price).toFixed(2)}</div>
+                        <div class="availability ${item.available ? 'in-stock' : 'out-of-stock'}">
+                            ${item.available ? 'Available' : 'Not Available'}
                         </div>
                     </div>
-                    <button class="rent-button" onclick="openRentalModal(${item.id})" ${item.available_quantity <= 0 ? 'disabled' : ''}>
-                        ${item.available_quantity > 0 ? 'Rent Now' : 'Unavailable'}
+                    <button class="rent-button" onclick="orderItem(${item.id})" ${!item.available ? 'disabled' : ''}>
+                        ${item.available ? 'Order Now' : 'Unavailable'}
                     </button>
                 </div>
             </div>
@@ -289,8 +174,7 @@ function searchItems() {
     if (searchTerm) {
         filteredItems = filteredItems.filter(item => 
             item.name.toLowerCase().includes(searchTerm) ||
-            item.description.toLowerCase().includes(searchTerm) ||
-            (item.specifications && item.specifications.toLowerCase().includes(searchTerm))
+            (item.description && item.description.toLowerCase().includes(searchTerm))
         );
     }
     
@@ -302,165 +186,20 @@ function searchItems() {
     displayItems(filteredItems);
 }
 
-// Open rental modal
-function openRentalModal(itemId) {
-    const item = items.find(i => i.id == itemId);
-    if (!item) return;
-    
-    document.getElementById('itemId').value = itemId;
-    document.getElementById('rentalModal').style.display = 'block';
-    
-    // Store item price for calculation
-    document.getElementById('rentalModal').dataset.itemPrice = item.price_per_day;
-    document.getElementById('rentalModal').dataset.maxQuantity = item.available_quantity;
-    
-    // Set max quantity
-    const quantityInput = document.getElementById('quantity');
-    if (quantityInput) {
-        quantityInput.max = item.available_quantity;
-    }
-    
-    calculateTotalCost();
-}
-
-// Update return date minimum when rental date changes
-function updateReturnDateMin() {
-    const rentalDate = document.getElementById('rentalDate').value;
-    const returnDateInput = document.getElementById('returnDate');
-    
-    if (rentalDate && returnDateInput) {
-        const nextDay = new Date(rentalDate);
-        nextDay.setDate(nextDay.getDate() + 1);
-        returnDateInput.min = nextDay.toISOString().split('T')[0];
-        calculateTotalCost();
+// Order item - requires login
+function orderItem(itemId) {
+    // Show login required modal
+    const modal = document.getElementById('loginRequiredModal');
+    if (modal) {
+        modal.style.display = 'block';
     }
 }
 
-// Calculate total rental cost
-function calculateTotalCost() {
-    const modal = document.getElementById('rentalModal');
-    const rentalDate = document.getElementById('rentalDate')?.value;
-    const returnDate = document.getElementById('returnDate')?.value;
-    const quantity = document.getElementById('quantity')?.value || 1;
-    const pricePerDay = parseFloat(modal?.dataset.itemPrice || 0);
-    
-    if (rentalDate && returnDate && pricePerDay) {
-        const startDate = new Date(rentalDate);
-        const endDate = new Date(returnDate);
-        const timeDiff = endDate - startDate;
-        const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-        
-        if (daysDiff > 0) {
-            const totalCost = daysDiff * pricePerDay * quantity;
-            document.getElementById('totalCost').textContent = totalCost.toFixed(2);
-        } else {
-            document.getElementById('totalCost').textContent = '0.00';
-        }
-    }
-}
-
-// Handle rental form submission
-async function handleRentalSubmit(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(e.target);
-    const submitButton = e.target.querySelector('button[type="submit"]');
-    
-    try {
-        submitButton.disabled = true;
-        submitButton.textContent = 'Submitting...';
-        
-        const response = await fetch('api/rentals.php', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showSuccess('Rental request submitted successfully! We will contact you soon.');
-            document.getElementById('rentalModal').style.display = 'none';
-            e.target.reset();
-            // Refresh items to update availability
-            loadItems();
-        } else {
-            showError(data.message || 'Failed to submit rental request');
-        }
-    } catch (error) {
-        console.error('Error submitting rental:', error);
-        showError('Error connecting to server');
-    } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = 'Submit Rental Request';
-    }
-}
-
-// Handle feedback form submission
-async function handleFeedbackSubmit(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(e.target);
-    const submitButton = e.target.querySelector('button[type="submit"]');
-    
-    try {
-        submitButton.disabled = true;
-        submitButton.textContent = 'Submitting...';
-        
-        const response = await fetch('api/feedback.php', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showSuccess('Thank you for your feedback!');
-            document.getElementById('feedbackModal').style.display = 'none';
-            e.target.reset();
-            selectedRating = 0;
-            updateStarDisplay();
-        } else {
-            showError(data.message || 'Failed to submit feedback');
-        }
-    } catch (error) {
-        console.error('Error submitting feedback:', error);
-        showError('Error connecting to server');
-    } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = 'Submit Feedback';
-    }
-}
-
-// Handle contact form submission
-async function handleContactSubmit(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(e.target);
-    const submitButton = e.target.querySelector('button[type="submit"]');
-    
-    try {
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-        
-        const response = await fetch('api/contact.php', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            showSuccess('Message sent successfully! We will get back to you soon.');
-            e.target.reset();
-        } else {
-            showError(data.message || 'Failed to send message');
-        }
-    } catch (error) {
-        console.error('Error sending message:', error);
-        showError('Error connecting to server');
-    } finally {
-        submitButton.disabled = false;
-        submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
+// Close login modal
+function closeLoginModal() {
+    const modal = document.getElementById('loginRequiredModal');
+    if (modal) {
+        modal.style.display = 'none';
     }
 }
 
@@ -470,10 +209,6 @@ function scrollToItems() {
     if (itemsSection) {
         itemsSection.scrollIntoView({ behavior: 'smooth' });
     }
-}
-
-function openFeedbackModal() {
-    document.getElementById('feedbackModal').style.display = 'block';
 }
 
 function showLoading() {
@@ -581,6 +316,51 @@ notificationStyles.textContent = `
         font-size: 1.2rem;
         cursor: pointer;
         margin-left: auto;
+    }
+    
+    .login-required-content {
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .login-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    
+    .login-buttons .btn {
+        padding: 12px 25px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: transform 0.3s;
+    }
+    
+    .login-buttons .btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+    
+    .btn-secondary {
+        background: #95a5a6;
+        color: white;
+    }
+    
+    .canteen-hero {
+        background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                    url('https://images.unsplash.com/photo-1567521464027-f127ff144326?ixlib=rb-4.0.3') center/cover !important;
+    }
+    
+    .login-btn {
+        background: rgba(255,255,255,0.2);
+        padding: 8px 15px;
+        border-radius: 5px;
     }
 `;
 document.head.appendChild(notificationStyles);
