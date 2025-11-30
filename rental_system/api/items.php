@@ -31,10 +31,11 @@ switch($method) {
 
 function getItems($db) {
     try {
-        $query = "SELECT i.*, c.name as category_name 
-                 FROM items i 
-                 LEFT JOIN categories c ON i.category_id = c.id 
-                 ORDER BY i.name";
+        $query = "SELECT f.*, c.name as category_name 
+                 FROM food_items f 
+                 LEFT JOIN categories c ON f.category_id = c.id 
+                 WHERE f.available = 1
+                 ORDER BY c.name, f.name";
         
         $stmt = $db->prepare($query);
         $stmt->execute();
@@ -57,18 +58,17 @@ function createItem($db) {
     try {
         $data = json_decode(file_get_contents('php://input'), true);
         
-        $query = "INSERT INTO items (name, description, category_id, price_per_day, image_url, available_quantity, total_quantity, specifications) 
-                 VALUES (:name, :description, :category_id, :price_per_day, :image_url, :available_quantity, :total_quantity, :specifications)";
+        $query = "INSERT INTO food_items (name, description, category_id, price, image_url, available) 
+                 VALUES (:name, :description, :category_id, :price, :image_url, :available)";
         
         $stmt = $db->prepare($query);
         $stmt->bindParam(':name', $data['name']);
         $stmt->bindParam(':description', $data['description']);
         $stmt->bindParam(':category_id', $data['category_id']);
-        $stmt->bindParam(':price_per_day', $data['price_per_day']);
+        $stmt->bindParam(':price', $data['price']);
         $stmt->bindParam(':image_url', $data['image_url']);
-        $stmt->bindParam(':available_quantity', $data['available_quantity']);
-        $stmt->bindParam(':total_quantity', $data['total_quantity']);
-        $stmt->bindParam(':specifications', $data['specifications']);
+        $available = isset($data['available']) ? $data['available'] : 1;
+        $stmt->bindParam(':available', $available);
         
         if($stmt->execute()) {
             echo json_encode([
@@ -92,15 +92,13 @@ function updateItem($db) {
     try {
         $data = json_decode(file_get_contents('php://input'), true);
         
-        $query = "UPDATE items SET 
+        $query = "UPDATE food_items SET 
                  name = :name,
                  description = :description,
                  category_id = :category_id,
-                 price_per_day = :price_per_day,
+                 price = :price,
                  image_url = :image_url,
-                 available_quantity = :available_quantity,
-                 total_quantity = :total_quantity,
-                 specifications = :specifications,
+                 available = :available,
                  updated_at = CURRENT_TIMESTAMP
                  WHERE id = :id";
         
@@ -109,11 +107,9 @@ function updateItem($db) {
         $stmt->bindParam(':name', $data['name']);
         $stmt->bindParam(':description', $data['description']);
         $stmt->bindParam(':category_id', $data['category_id']);
-        $stmt->bindParam(':price_per_day', $data['price_per_day']);
+        $stmt->bindParam(':price', $data['price']);
         $stmt->bindParam(':image_url', $data['image_url']);
-        $stmt->bindParam(':available_quantity', $data['available_quantity']);
-        $stmt->bindParam(':total_quantity', $data['total_quantity']);
-        $stmt->bindParam(':specifications', $data['specifications']);
+        $stmt->bindParam(':available', $data['available']);
         
         if($stmt->execute()) {
             echo json_encode([
@@ -141,7 +137,7 @@ function deleteItem($db) {
             return;
         }
         
-        $query = "DELETE FROM items WHERE id = :id";
+        $query = "DELETE FROM food_items WHERE id = :id";
         $stmt = $db->prepare($query);
         $stmt->bindParam(':id', $id);
         

@@ -1,7 +1,7 @@
 <?php
 class Database {
     private $host = 'localhost';
-    private $db_name = 'tool_rental';
+    private $db_name = 'canteen_system';
     private $username = 'root';
     private $password = '';
     public $conn;

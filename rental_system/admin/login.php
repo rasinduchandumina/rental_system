@@ -1,9 +1,15 @@
 <?php
 session_start();
 
-// If already logged in, redirect to dashboard
-if(isset($_SESSION['admin_id'])) {
+// If already logged in as admin, redirect to dashboard
+if(isset($_SESSION['user_id']) && $_SESSION['user_role'] == 'admin') {
     header('Location: dashboard.php');
+    exit();
+}
+
+// If logged in but not admin, redirect to main site
+if(isset($_SESSION['user_id']) && $_SESSION['user_role'] != 'admin') {
+    header('Location: ../order.php');
     exit();
 }
 
@@ -15,29 +21,36 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
     $database = new Database();
     $db = $database->getConnection();
     
-    $username = $_POST['username'];
+    $username = trim($_POST['username']);
     $password = $_POST['password'];
     
-    try {
-        $query = "SELECT * FROM users WHERE username = :username AND role = 'admin'";
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(':username', $username);
-        $stmt->execute();
-        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        // Default password for admin is 'password'
-        if($admin && ($password === 'password' || password_verify($password, $admin['password']))) {
-            $_SESSION['admin_id'] = $admin['id'];
-            $_SESSION['admin_username'] = $admin['username'];
-            $_SESSION['admin_name'] = $admin['full_name'];
-            header('Location: dashboard.php');
-            exit();
-        } else {
-            $error = 'Invalid credentials';
+    if(empty($username) || empty($password)) {
+        $error = 'Please fill in all fields';
+    } else {
+        try {
+            $query = "SELECT * FROM users WHERE username = :username AND role = 'admin'";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':username', $username);
+            $stmt->execute();
+            $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if($admin && password_verify($password, $admin['password'])) {
+                $_SESSION['user_id'] = $admin['id'];
+                $_SESSION['admin_id'] = $admin['id'];
+                $_SESSION['user_username'] = $admin['username'];
+                $_SESSION['admin_username'] = $admin['username'];
+                $_SESSION['user_name'] = $admin['full_name'];
+                $_SESSION['admin_name'] = $admin['full_name'];
+                $_SESSION['user_role'] = 'admin';
+                header('Location: dashboard.php');
+                exit();
+            } else {
+                $error = 'Invalid username or password';
+            }
+            
+        } catch(Exception $e) {
+            $error = 'Database error: ' . $e->getMessage();
         }
-        
-    } catch(Exception $e) {
-        $error = 'Database error: ' . $e->getMessage();
     }
 }
 ?>
@@ -47,7 +60,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - Tool Rental System</title>
+    <title>Admin Login - Canteen System</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -178,7 +191,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="login-header">
             <i class="fas fa-user-shield"></i>
             <h2>Admin Login</h2>
-            <p>Tool Rental System</p>
+            <p>Canteen Management System</p>
         </div>
         
         <div class="demo-credentials">
@@ -189,7 +202,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         <?php if($error): ?>
             <div class="error">
-                <i class="fas fa-exclamation-triangle"></i> <?php echo $error; ?>
+                <i class="fas fa-exclamation-triangle"></i> <?php echo htmlspecialchars($error); ?>
             </div>
         <?php endif; ?>
         
@@ -198,7 +211,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <label for="username">
                     <i class="fas fa-user"></i> Username
                 </label>
-                <input type="text" id="username" name="username" required>
+                <input type="text" id="username" name="username" required 
+                       value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>">
             </div>
             
             <div class="form-group">
@@ -215,7 +229,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         <div class="back-link">
             <a href="../index.html">
-                <i class="fas fa-arrow-left"></i> Back to Website
+                <i class="fas fa-arrow-left"></i> Back to Menu
+            </a>
+            <br><br>
+            <a href="../login.php">
+                <i class="fas fa-users"></i> Student/Teacher Login
             </a>
         </div>
     </div>
