@@ -103,24 +103,38 @@ function updateFoodItem($db) {
         
         $data = json_decode(file_get_contents('php://input'), true);
         
-        $query = "UPDATE food_items SET 
-                 name = :name,
-                 description = :description,
-                 category_id = :category_id,
-                 price = :price,
-                 image_url = :image_url,
-                 available = :available,
-                 updated_at = CURRENT_TIMESTAMP
-                 WHERE id = :id";
+        if(empty($data['id'])) {
+            echo json_encode(['success' => false, 'message' => 'Item ID required']);
+            return;
+        }
         
-        $stmt = $db->prepare($query);
-        $stmt->bindParam(':id', $data['id']);
-        $stmt->bindParam(':name', $data['name']);
-        $stmt->bindParam(':description', $data['description']);
-        $stmt->bindParam(':category_id', $data['category_id']);
-        $stmt->bindParam(':price', $data['price']);
-        $stmt->bindParam(':image_url', $data['image_url']);
-        $stmt->bindParam(':available', $data['available']);
+        // Check if this is just a toggle availability request
+        if(isset($data['toggle_availability'])) {
+            $query = "UPDATE food_items SET available = :available, updated_at = CURRENT_TIMESTAMP WHERE id = :id";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':id', $data['id']);
+            $stmt->bindParam(':available', $data['available']);
+        } else {
+            // Full update
+            $query = "UPDATE food_items SET 
+                     name = :name,
+                     description = :description,
+                     category_id = :category_id,
+                     price = :price,
+                     image_url = :image_url,
+                     available = :available,
+                     updated_at = CURRENT_TIMESTAMP
+                     WHERE id = :id";
+            
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':id', $data['id']);
+            $stmt->bindParam(':name', $data['name']);
+            $stmt->bindParam(':description', $data['description']);
+            $stmt->bindParam(':category_id', $data['category_id']);
+            $stmt->bindParam(':price', $data['price']);
+            $stmt->bindParam(':image_url', $data['image_url']);
+            $stmt->bindParam(':available', $data['available']);
+        }
         
         if($stmt->execute()) {
             echo json_encode([

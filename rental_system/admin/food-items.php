@@ -493,11 +493,7 @@ $foodItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     body: JSON.stringify({ 
                         id: id, 
                         available: available,
-                        name: document.querySelector(`.food-card[data-id="${id}"] h3`).textContent,
-                        description: '',
-                        category_id: document.querySelector(`.food-card[data-id="${id}"]`).dataset.category,
-                        price: 0,
-                        image_url: ''
+                        toggle_availability: true
                     })
                 });
                 

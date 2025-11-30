@@ -39,6 +39,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error = 'Please enter a valid email address';
     } elseif(!in_array($role, ['teacher', 'student'])) {
         $error = 'Invalid role selected';
+    } elseif(!empty($phone) && !preg_match('/^[0-9+\-\s()]{7,20}$/', $phone)) {
+        $error = 'Please enter a valid phone number';
     } else {
         try {
             // Check if username already exists

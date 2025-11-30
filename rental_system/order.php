@@ -744,11 +744,11 @@ $food_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     });
                     updateCart();
                 } else {
-                    alert(data.message || 'Failed to place order');
+                    alert(data.message || 'Failed to place order. Please try again.');
                 }
             } catch(error) {
                 console.error('Error:', error);
-                alert('Error connecting to server');
+                alert('Unable to connect to the server. Please check your internet connection and try again.');
             } finally {
                 this.disabled = false;
                 this.innerHTML = '<i class="fas fa-check-circle"></i> Place Order';

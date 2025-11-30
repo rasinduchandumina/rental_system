@@ -26,12 +26,22 @@ switch($method) {
 
 function generateOrderCode($db) {
     // Generate a unique 5-digit code
+    $maxRetries = 100;
+    $retries = 0;
+    
     do {
         $code = str_pad(mt_rand(0, 99999), 5, '0', STR_PAD_LEFT);
         $query = "SELECT id FROM orders WHERE order_code = :code AND status NOT IN ('completed', 'cancelled')";
         $stmt = $db->prepare($query);
         $stmt->bindParam(':code', $code);
         $stmt->execute();
+        $retries++;
+        
+        if ($retries >= $maxRetries) {
+            // If we've exceeded retries, use timestamp-based code as fallback
+            $code = substr(str_pad(time() % 100000, 5, '0', STR_PAD_LEFT), 0, 5);
+            break;
+        }
     } while($stmt->fetch());
     
     return $code;
